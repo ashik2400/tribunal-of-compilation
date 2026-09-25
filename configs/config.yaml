@@ -1,0 +1,33 @@
+# Single source of truth for paths, thresholds, and model choices.
+#
+# THE RULE: no .py file ever hardcodes a path, a threshold, or a model
+# name — it reads it from here instead. This is what lets you change,
+# say, the audit budget from 5 twins to 8 by editing ONE line, and it's
+# what lets MLflow later log "this run used config X" so a result is
+# always traceable back to exactly what produced it.
+#
+# Most values below are placeholders until the components that use them
+# exist (Compiler, MLflow tracking, etc.) — filled in as we build.
+
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  rules: "rules"
+
+domain:
+  name: "repo_repair"          # swappable via the pluggable domain adapter interface
+
+compiler:
+  min_consistent_solves: 3     # how many high-confidence repeats before drafting a rule
+  # (placeholder — actual number to be decided when we build the Compiler)
+
+auditor:
+  twin_case_budget: 5          # twin cases generated per candidate rule
+  max_repair_attempts: 2       # Compiler repair attempts before permanent deferral
+
+llm:
+  provider: "groq"             # "groq" (free tier, llama family) or "anthropic"
+  # keep this key separate from any Claude Code Pro plan budget — see .env (not committed)
+
+embeddings:
+  model: "all-MiniLM-L6-v2"    # local, lightweight — used for pattern similarity, not LLM calls

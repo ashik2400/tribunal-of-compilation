@@ -1,0 +1,7 @@
+# Milestone 1 (repo scaffold + version control) — kept minimal on purpose.
+# We add packages incrementally, one milestone at a time, rather than
+# dumping the full stack (LangGraph, MLflow, FastAPI, etc.) now — that way
+# every dependency you install has a reason you just learned, attached to it.
+
+dvc>=3.50          # data version control (Step 2 below)
+pyyaml>=6.0         # for reading configs/config.yaml

@@ -1,0 +1,37 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+*.pyc
+
+# --- Environment / secrets ---
+.env
+*.key
+
+# --- DVC ---
+# DVC tracks data via small .dvc pointer files that DO get committed.
+# The actual data itself is what gets ignored — DVC manages this
+# automatically by writing rules into this file when you run `dvc add`,
+# but we seed the common ones now so nothing large slips into git by
+# accident before your first `dvc add`.
+/data/processed/*
+!/data/processed/.gitkeep
+/data/raw/*
+!/data/raw/.gitkeep
+
+# --- MLflow (added later, when Compiler/Auditor tracking is wired up) ---
+mlruns/
+mlartifacts/
+
+# --- OS / editor ---
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# --- Docker (added later at packaging milestone) ---
+# (nothing to ignore yet — placeholder for when Dockerfile/volumes appear)
