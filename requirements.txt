@@ -5,3 +5,4 @@
 
 dvc>=3.50          # data version control (Step 2 below)
 pyyaml>=6.0         # for reading configs/config.yaml
+pydantic>=2.6       # task schema + validation gate (Milestone 2)

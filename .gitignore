@@ -12,16 +12,6 @@ env/
 .env
 *.key
 
-# --- DVC ---
-# DVC tracks data via small .dvc pointer files that DO get committed.
-# The actual data itself is what gets ignored — DVC manages this
-# automatically by writing rules into this file when you run `dvc add`,
-# but we seed the common ones now so nothing large slips into git by
-# accident before your first `dvc add`.
-/data/processed/*
-!/data/processed/.gitkeep
-/data/raw/*
-!/data/raw/.gitkeep
 
 # --- MLflow (added later, when Compiler/Auditor tracking is wired up) ---
 mlruns/

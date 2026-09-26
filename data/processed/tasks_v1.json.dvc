@@ -1,0 +1,5 @@
+outs:
+- md5: 900b52ef0466645762e1f53290499665
+  size: 18353
+  hash: md5
+  path: tasks_v1.json
