@@ -41,7 +41,8 @@ with open(args.out, "a") as f:
         correct = is_correct(task, res.solution)
         strict = isinstance(res.solution, dict) and domain.check_ground_truth(task, res.solution)
         rec = {"ts": time.time(), "task_id": task.task_id, "bug_family": task.bug_family,
-               "variant": task.variant, "solution": res.solution, "verified": res.verified,
+               "variant": task.variant, "traceback": task.traceback, "files": task.files,
+               "solution": res.solution, "verified": res.verified,
                "correct": correct, "strict_match": strict, "confidence": res.confidence,
                "self_reported_confidence": res.self_reported_confidence, "attempts": res.attempts,
                "steps": res.steps, "reflections": res.reflections, "trace": res.trace}
