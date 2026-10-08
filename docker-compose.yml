@@ -1,0 +1,14 @@
+services:
+  router:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"      # localhost only: submitted repos are executed to verify fixes
+    env_file: .env                 # GROQ_API_KEY / GROQ_MODEL, needed only when no rule matches
+    environment:
+      REGISTRY_PATH: /app/rules/registry.json
+    volumes:
+      - ./rules:/app/rules         # registry_cli on the host changes what the container serves
+      - ./runs:/app/runs           # router_log.jsonl for the shadow-check loop
+    read_only: true                # nothing inside the container can modify the image
+    tmpfs:
+      - /tmp                       # scratch space for sandboxes

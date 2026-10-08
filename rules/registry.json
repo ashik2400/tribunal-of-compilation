@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "rule_4876b859": {
+      "rule": {
+        "rule_id": "rule_4876b859",
+        "signature": "ModuleNotFoundError: No module named '{}'",
+        "scope": [
+          {
+            "op": "file_exists",
+            "glob": "utils/{0}.py",
+            "text": null
+          },
+          {
+            "op": "file_absent",
+            "glob": "lib/{0}.py",
+            "text": null
+          },
+          {
+            "op": "text_contains",
+            "glob": "**/*.py",
+            "text": "import {0}"
+          }
+        ],
+        "action": {
+          "type": "fix_import",
+          "replace_line": "import {0}",
+          "with_line": "from utils import {0}"
+        },
+        "rationale": "The fix is only safe if the module exists in utils and does not also exist in lib, which would indicate a local package that should be installed or imported differently rather than aliased from utils.",
+        "supporting_task_ids": [
+          "import_error_twin__needs_local_import__3c8e5eea",
+          "import_error_twin__needs_local_import__5f9967f0",
+          "import_error_twin__needs_local_import__1f55c735"
+        ]
+      },
+      "state": "production",
+      "version": 1,
+      "fingerprint": "c0917482046ab036",
+      "audit": {
+        "verdict": "passed",
+        "repairs_used": 1,
+        "final_round_twins": {
+          "mutation:INVALID": 4,
+          "mutation:INCONCLUSIVE": 2,
+          "llm:PASS": 3,
+          "llm:INVALID": 1
+        },
+        "reason": "3 conclusive passes, 0 breaks"
+      },
+      "history": [
+        {
+          "ts": 1791449530.3293657,
+          "from_state": null,
+          "to_state": "staging",
+          "reason": "audit passed",
+          "fingerprint": "c0917482046ab036"
+        },
+        {
+          "ts": 1791449538.1674175,
+          "from_state": "staging",
+          "to_state": "production",
+          "reason": "cleared audit and conflict check",
+          "fingerprint": "c0917482046ab036"
+        }
+      ],
+      "stats": {
+        "shadow_checks": 0,
+        "divergences": 0
+      }
+    },
+    "rule_6169da8c": {
+      "rule": {
+        "rule_id": "rule_6169da8c",
+        "signature": "ModuleNotFoundError: No module named '{}'",
+        "scope": [
+          {
+            "op": "text_contains",
+            "glob": "**/*.py",
+            "text": "import {0}"
+          },
+          {
+            "op": "file_absent",
+            "glob": "**/{0}.py",
+            "text": null
+          },
+          {
+            "op": "file_absent",
+            "glob": "**/{0}/__init__.py",
+            "text": null
+          }
+        ],
+        "action": {
+          "type": "pip_install",
+          "package": "{0}"
+        },
+        "rationale": "The fix is safe only if the module is not defined locally in the repository (neither as a file nor a package directory), ensuring the error is due to a missing external dependency rather than a local import path issue.",
+        "supporting_task_ids": [
+          "import_error_twin__missing_package__381edb1c",
+          "import_error_twin__missing_package__7229ce43",
+          "import_error_twin__missing_package__c8e43fca"
+        ]
+      },
+      "state": "production",
+      "version": 1,
+      "fingerprint": "390490aef248186e",
+      "audit": {
+        "verdict": "passed",
+        "repairs_used": 1,
+        "final_round_twins": {
+          "mutation:INVALID": 4,
+          "control:PASS": 3
+        },
+        "reason": "3 conclusive passes, 0 breaks"
+      },
+      "history": [
+        {
+          "ts": 1791449530.3313653,
+          "from_state": null,
+          "to_state": "staging",
+          "reason": "audit passed",
+          "fingerprint": "390490aef248186e"
+        },
+        {
+          "ts": 1791449538.1694183,
+          "from_state": "staging",
+          "to_state": "production",
+          "reason": "cleared audit and conflict check",
+          "fingerprint": "390490aef248186e"
+        }
+      ],
+      "stats": {
+        "shadow_checks": 0,
+        "divergences": 0
+      }
+    }
+  }
+}

@@ -77,3 +77,23 @@ class Rule(BaseModel):
 
     def fix(self, captures: list[str]) -> dict:
         return fill_any(self.action, captures)
+
+
+def provably_disjoint(a: "Rule", b: "Rule") -> bool:
+    """True only if NO repo can satisfy both rules' scopes (so they can never both fire).
+    Conservative: a False answer means 'could not prove it', not 'they overlap'.
+    Proof patterns: different signatures; file_exists <concrete path> vs file_absent <glob matching it>;
+    text_contains vs text_absent on the same glob and text."""
+    if a.signature != b.signature:
+        return True
+    caps = [f"cap{i}" for i in range(10)]          # same placeholder substitution on both sides
+
+    def clash(p: Predicate, q: Predicate) -> bool:
+        gp, gq = fill(p.glob, caps), fill(q.glob, caps)
+        if p.op == "file_exists" and q.op == "file_absent":
+            return not any(ch in gp for ch in "*?[") and _glob_match(gp, gq)
+        if p.op == "text_contains" and q.op == "text_absent":
+            return gp == gq and fill(p.text or "", caps) == fill(q.text or "", caps)
+        return False
+
+    return any(clash(p, q) or clash(q, p) for p in a.scope for q in b.scope)
