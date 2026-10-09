@@ -65,7 +65,7 @@
         }
       ],
       "stats": {
-        "shadow_checks": 0,
+        "shadow_checks": 3,
         "divergences": 0
       }
     },
@@ -130,7 +130,7 @@
         }
       ],
       "stats": {
-        "shadow_checks": 0,
+        "shadow_checks": 1,
         "divergences": 0
       }
     }

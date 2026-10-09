@@ -96,6 +96,18 @@ def _unescape(text: str) -> str:
     return text
 
 
+def solver_consensus(backend: AuditBackend, task: Any, k: int):
+    """Run the Solver k times. Returns (fix or None, runs, why-not). A fix counts only if every run
+    produced a verified answer and all runs made the same decision."""
+    solves = [backend.solve(task) for _ in range(k)]
+    runs = [{"fix": fix, "verified": ok} for fix, ok in solves]
+    if not all(fix and ok for fix, ok in solves):
+        return None, runs, "Solver did not produce a verified fix on every run"
+    if len({backend.decision_key(fix) for fix, _ in solves}) != 1:
+        return None, runs, "Solver runs disagreed with each other"
+    return solves[0][0], runs, ""
+
+
 def _hash(files: dict) -> str:
     return hashlib.sha1(json.dumps(files, sort_keys=True).encode()).hexdigest()
 
@@ -177,14 +189,7 @@ class Auditor:
 
     # ---------- one twin ----------
     def _consensus(self, task, k: int):
-        """Run the Solver k times. Returns (fix or None, runs, why-not)."""
-        solves = [self.backend.solve(task) for _ in range(k)]
-        runs = [{"fix": fix, "verified": ok} for fix, ok in solves]
-        if not all(fix and ok for fix, ok in solves):
-            return None, runs, "Solver did not produce a verified fix on every run"
-        if len({self.backend.decision_key(fix) for fix, _ in solves}) != 1:
-            return None, runs, "Solver runs disagreed with each other"
-        return solves[0][0], runs, ""
+        return solver_consensus(self.backend, task, k)
 
     def _evaluate(self, rule: Rule, raw: Any, seen: set, example_hashes: set, k: int | None = None) -> TwinResult:
         b = self.backend

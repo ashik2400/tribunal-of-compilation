@@ -65,6 +65,7 @@ class Router:
         if not self.log_path:
             return
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
-        rec = {"ts": self.clock(), **asdict(res), "traceback": task.traceback, "files": task.files}
+        rec = {"ts": self.clock(), **asdict(res), "traceback": task.traceback, "files": task.files,
+               "entry_point": getattr(task, "entry_point", "main.py")}
         with self.log_path.open("a") as f:
             f.write(json.dumps(rec) + "\n")

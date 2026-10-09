@@ -171,6 +171,18 @@ class Registry:
                 return None, f"ambiguous: {hits[0].rule_id} and {other.rule_id} disagree"
         return hits[0], "ok"
 
+    def record_shadow(self, rule_id: str, outcome: str) -> Entry:
+        """outcome: agree | diverge | inconclusive. Updates the rule's running shadow-check statistics."""
+        if outcome not in ("agree", "diverge", "inconclusive"):
+            raise RegistryError(f"unknown shadow outcome {outcome!r}")
+        e = self._get(rule_id)
+        e.stats["shadow_checks"] = e.stats.get("shadow_checks", 0) + 1
+        key = {"diverge": "divergences", "inconclusive": "inconclusive"}.get(outcome)
+        if key:
+            e.stats[key] = e.stats.get(key, 0) + 1
+        self._save()
+        return e
+
     def requeue_signatures(self) -> list[str]:
         """Signatures of demoted rules: patterns the Compiler should look at again."""
         return sorted({e.rule.signature for e in self.entries.values() if e.state == "demoted"})
