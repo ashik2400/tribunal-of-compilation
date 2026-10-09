@@ -2,3 +2,4 @@
 -r requirements.txt
 dvc>=3.50              # data version control
 # mlflow>=2.10         # optional: only for `audit_rules --mlflow`
+matplotlib>=3.8        # charts: scripts/plot_experiment.py
