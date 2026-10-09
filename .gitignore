@@ -27,3 +27,4 @@ mlartifacts/
 
 # --- Docker (added later at packaging milestone) ---
 # (nothing to ignore yet — placeholder for when Dockerfile/volumes appear)
+.venv*/

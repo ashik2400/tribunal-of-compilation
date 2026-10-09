@@ -1,0 +1,4 @@
+# Local tooling only: not needed by CI or the Docker image.
+-r requirements.txt
+dvc>=3.50              # data version control
+# mlflow>=2.10         # optional: only for `audit_rules --mlflow`

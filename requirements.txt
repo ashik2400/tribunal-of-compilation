@@ -1,8 +1,9 @@
-# Milestone 1 (repo scaffold + version control) — kept minimal on purpose.
-# We add packages incrementally, one milestone at a time, rather than
-# dumping the full stack (LangGraph, MLflow, FastAPI, etc.) now — that way
-# every dependency you install has a reason you just learned, attached to it.
-
-dvc>=3.50          # data version control (Step 2 below)
-pyyaml>=6.0         # for reading configs/config.yaml
-pydantic>=2.6       # task schema + validation gate (Milestone 2)
+# Runtime + tests: everything CI and the Docker image need.
+pyyaml>=6.0            # configs/config.yaml
+pydantic>=2.6          # task schema, rules, registry
+python-dotenv>=1.0     # loads .env (GROQ_API_KEY, GROQ_MODEL)
+groq>=0.9              # LLM provider (Groq free tier)
+fastapi>=0.110         # HTTP service (Milestone 6)
+uvicorn>=0.29          # serves the FastAPI app
+httpx>=0.27            # FastAPI test client
+pytest>=8.0            # unit tests
