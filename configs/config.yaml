@@ -25,8 +25,11 @@ auditor:
   twin_case_budget: 5          # twin cases generated per candidate rule
   max_repair_attempts: 2       # Compiler repair attempts before permanent deferral
 
-llm:
+llm:                           # read by src/config.py -> get_llm_config()
   provider: "groq"             # "groq" (free tier, llama family) or "anthropic"
+  model: "qwen/qwen3.8-27b"    # env GROQ_MODEL overrides this (groq provider only)
+  temperature: 0.2
+  max_tokens: 900              # env LLM_MAX_TOKENS overrides this
   # keep this key separate from any Claude Code Pro plan budget — see .env (not committed)
 
 embeddings:

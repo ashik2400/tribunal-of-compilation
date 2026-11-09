@@ -2,7 +2,6 @@
 can use it without importing the web framework."""
 from __future__ import annotations
 
-import os
 from typing import Any
 
 from src.domain.repo_repair.solver_tools import (INSTRUCTIONS, RepoSandbox, _as_fix, render_task, validate_fix,
@@ -12,8 +11,9 @@ from src.solver import Solver
 
 def default_solver_factory():
     """Built lazily: the LLM is only needed (and its key only required) when no rule matches."""
+    from src.config import get_llm_config
     from src.llm import make_llm
-    llm = make_llm({"provider": "groq", "model": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")})
+    llm = make_llm(get_llm_config())
 
     def solve(task) -> tuple[Any, bool, int]:
         sb = RepoSandbox(task)

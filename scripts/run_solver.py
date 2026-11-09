@@ -10,6 +10,7 @@ load_dotenv()
 if not os.getenv("GROQ_API_KEY"):
     sys.exit("GROQ_API_KEY not found - check .env")
 
+from src.config import get_llm_config
 from src.domain.repo_repair.generator import RepoRepairDomain
 from src.domain.repo_repair.schema import RepoRepairTask
 from src.domain.repo_repair.solver_tools import (INSTRUCTIONS, RepoSandbox, is_correct,
@@ -24,7 +25,7 @@ ap.add_argument("--out", default="runs/solver_runs.jsonl")
 args = ap.parse_args()
 
 tasks = [RepoRepairTask(**d) for d in json.loads(Path(args.tasks).read_text())][: args.n]
-llm = make_llm({"provider": "groq", "model": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")})
+llm = make_llm(get_llm_config())
 domain = RepoRepairDomain()
 Path(args.out).parent.mkdir(parents=True, exist_ok=True)
 tally = collections.defaultdict(lambda: collections.Counter())

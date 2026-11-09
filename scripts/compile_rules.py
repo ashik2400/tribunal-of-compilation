@@ -11,6 +11,7 @@ if not os.getenv("GROQ_API_KEY"):
     sys.exit("GROQ_API_KEY not found - check .env")
 
 from src.compiler import Compiler, dedupe_candidates, find_candidates
+from src.config import get_llm_config
 from src.domain.repo_repair.solver_tools import validate_fix
 from src.llm import make_llm
 
@@ -27,7 +28,7 @@ raw = find_candidates(runs, n_required=args.n)
 cands = dedupe_candidates(raw)
 print(f"{len(runs)} runs -> {len(raw)} streak(s) -> {len(cands)} distinct candidate rule(s)")
 
-llm = make_llm({"provider": "groq", "model": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")})
+llm = make_llm(get_llm_config())
 compiler = Compiler(llm, validate_action=validate_fix)
 with open(args.out, "a") as f:
     for c in cands:

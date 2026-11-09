@@ -12,6 +12,7 @@ if not os.getenv("GROQ_API_KEY"):
 
 from src.auditor import Auditor, RegressionSuite, candidate_from_rule
 from src.compiler import Compiler
+from src.config import get_llm_config
 from src.domain.repo_repair.audit_backend import make_backend
 from src.domain.repo_repair.solver_tools import validate_fix
 from src.llm import make_llm
@@ -46,7 +47,7 @@ if args.rule:
     rules = [r for r in rules if r.rule_id == args.rule]
     if not rules:
         sys.exit(f"no drafted rule with id {args.rule}")
-llm = make_llm({"provider": "groq", "model": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")})
+llm = make_llm(get_llm_config())
 auditor = Auditor(llm, make_backend(llm, mutations=args.mutations > 0, controls=args.controls > 0), k=args.k, n_twins=args.twins, gen_rounds=args.gen_rounds,
                   per_round=args.per_round, max_mutations=args.mutations,
                   max_controls=args.controls)

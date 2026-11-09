@@ -9,6 +9,7 @@ load_dotenv()                                   # loads GROQ_API_KEY from .env
 if not os.getenv("GROQ_API_KEY"):
     sys.exit("GROQ_API_KEY not found - check .env is in the project root")
 
+from src.config import get_llm_config
 from src.llm import make_llm
 from src.solver import Solver, Tool
 
@@ -38,7 +39,8 @@ def verify(task, solution: str) -> bool:        # toy verifier: stands in for 'r
     s = solution.lower()
     return "utils.colorutils" in s and "pip install" not in s
 
-llm = make_llm({"provider": "groq", "model": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")})
+# this smoke test has always defaulted to a different model than the pipeline; GROQ_MODEL still overrides it
+llm = make_llm(get_llm_config(default_model="llama-3.3-70b-versatile"))
 result = Solver(llm, TOOLS, verify).solve(TASK)
 
 for t in result.trace:
