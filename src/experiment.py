@@ -42,17 +42,19 @@ class NaiveRegistry(Registry):
         return (hits[0], "first match") if hits else (None, "no production rule matches")
 
 
-def build_stream(make_task: Callable[[], Any], n_first: int = 20, n_mixed_first: int = 20, n_mixed_twin: int = 20,
+def build_stream(make_task: Callable[..., Any], n_first: int = 20, n_mixed_first: int = 20, n_mixed_twin: int = 20,
                  first_variant: str = "missing_package", twin_variant: str = "needs_local_import",
                  seed: int = 0, max_attempts: int = 5000) -> list:
     """Phase 1: n_first tasks of the first variant (so rules get compiled from a clean streak).
-    Phase 2: a shuffled mix of the two variants (the twins arrive AFTER the rules exist)."""
+    Phase 2: a shuffled mix of the two variants (the twins arrive AFTER the rules exist).
+    make_task is called as make_task(seed=<task seed>). Task seeds are seed*max_attempts + attempt, so every
+    stream draws from its own disjoint seed range and the whole stream is a pure function of `seed`."""
     need = {first_variant: n_first + n_mixed_first, twin_variant: n_mixed_twin}
     got: dict[str, list] = {v: [] for v in need}
-    for _ in range(max_attempts):
+    for attempt in range(max_attempts):
         if all(len(got[v]) >= need[v] for v in need):
             break
-        t = make_task()
+        t = make_task(seed=seed * max_attempts + attempt)
         if t.variant in got and len(got[t.variant]) < need[t.variant]:
             got[t.variant].append(t)
     if any(len(got[v]) < need[v] for v in need):

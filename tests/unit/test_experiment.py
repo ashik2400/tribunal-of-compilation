@@ -12,10 +12,9 @@ TB = "ModuleNotFoundError: No module named 'colorutils'"
 _ids = itertools.count()
 
 
-def maker(seed=0):
-    rng = random.Random(seed)
-    def make():
-        v = rng.choice(["missing_package", "needs_local_import"])
+def maker(stream_seed=0):
+    def make(seed):                                  # build_stream passes an explicit per-task seed
+        v = random.Random(f"{stream_seed}:{seed}").choice(["missing_package", "needs_local_import"])
         files, truth = (MISSING, PIP_C) if v == "missing_package" else (LOCAL, IMP_C)
         return RepoRepairTask(task_id=f"t{next(_ids)}", bug_family="f", variant=v, files=files, entry_point="main.py",
                               traceback=TB, ground_truth=GroundTruthFix(description="d", action=truth))
@@ -45,7 +44,7 @@ def test_stream_shape_twins_arrive_after_the_clean_phase():
     assert [t.task_id for t in stream(seed=3)] != [t.task_id for t in stream(seed=4)]
     assert [t.task_id for t in stream(seed=3)] == [t.task_id for t in stream(seed=3)]      # reproducible ids
     with pytest.raises(RuntimeError):
-        build_stream(lambda: next(iter([])) if False else maker()(), 5, 5, 5, twin_variant="nope", max_attempts=50)
+        build_stream(maker(), 5, 5, 5, twin_variant="nope", max_attempts=50)
 
 
 def test_naive_registry_applies_first_match_even_when_rules_disagree():

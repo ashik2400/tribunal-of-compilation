@@ -8,18 +8,21 @@ Router, once they exist) only ever calls generate_task / check_ground_truth
 / tools and never looks inside this file.
 """
 
+import os
 import random
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
-import uuid
 from pathlib import Path
 
 from src.domain.base import DomainAdapter
 from src.domain.repo_repair.schema import GroundTruthFix, RepoRepairTask
 
 BUG_FAMILY = "import_error_twin"
+VARIANTS = ("missing_package", "needs_local_import")
+REPO_PLACEHOLDER = "<repo>"
 
 
 def _write_repo(tmp_dir: Path, files: dict[str, str]) -> None:
@@ -44,11 +47,25 @@ def _run_entry_point(tmp_dir: Path, entry_point: str) -> str:
         text=True,
         timeout=10,
     )
-    return result.stderr.strip()
+    return normalize_paths(result.stderr.strip(), tmp_dir)
+
+
+def normalize_paths(text: str, root: Path) -> str:
+    r"""Replace the throwaway temp directory with a fixed placeholder so stored tracebacks are identical on
+    every machine and every run:  File "C:\...\Temp\repo_repair_x1y2\main.py"  ->  File "<repo>/main.py".
+    Only the path prefix changes; the error line that signature_of() reads is untouched."""
+    prefixes = {str(root), root.as_posix(), str(root.resolve()), os.path.realpath(root)}
+    for prefix in sorted(prefixes, key=len, reverse=True):          # longest first: never leave a partial path
+        text = re.sub(re.escape(prefix) + r"[\\/]?", lambda _: REPO_PLACEHOLDER + "/", text)
+    # separators inside the repo-relative part ("<repo>/utils\x.py") become "/" too
+    return re.sub(re.escape(REPO_PLACEHOLDER) + r'/[^"\n]*', lambda m: m.group(0).replace("\\", "/"), text)
 
 
 class RepoRepairDomain(DomainAdapter):
-    def generate_task(self, bug_family: str | None = None) -> RepoRepairTask:
+    def generate_task(self, bug_family: str | None = None, *, seed: int,
+                      variant: str | None = None) -> RepoRepairTask:
+        """Deterministic: the same (bug_family, variant, seed) always yields the identical task.
+        If `variant` is omitted it is drawn from random.Random(seed), so the seed alone fixes the task."""
         # Only one bug_family exists right now. This is deliberately the
         # seam where a second bug_family gets added later -- one more
         # `elif family == "..."` block, nothing else in the project changes.
@@ -56,8 +73,11 @@ class RepoRepairDomain(DomainAdapter):
         if family != BUG_FAMILY:
             raise ValueError(f"unknown bug_family: {family}")
 
-        variant = random.choice(["missing_package", "needs_local_import"])
-        task_id = f"{family}__{variant}__{uuid.uuid4().hex[:8]}"
+        rng = random.Random(seed)
+        variant = variant or rng.choice(VARIANTS)
+        if variant not in VARIANTS:
+            raise ValueError(f"unknown variant for {family}: {variant}")
+        task_id = f"{family}__{variant}__s{seed}"
 
         if variant == "missing_package":
             files = {

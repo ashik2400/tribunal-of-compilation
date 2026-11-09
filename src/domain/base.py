@@ -20,14 +20,21 @@ class DomainAdapter(ABC):
     """Contract every pluggable domain must satisfy."""
 
     @abstractmethod
-    def generate_task(self, bug_family: str | None = None) -> Any:
+    def generate_task(self, bug_family: str | None = None, *, seed: int,
+                      variant: str | None = None) -> Any:
         """
-        Produce one task instance.
+        Produce one task instance, deterministically.
+
+        `seed` is required: the same (bug_family, variant, seed) must always
+        produce the identical task, task_id included, so a dataset or an
+        experiment stream can be regenerated exactly. Implementations must
+        draw any randomness from random.Random(seed), never module state.
 
         If `bug_family` is given, generate a task belonging to that specific
         family (used by the Auditor to generate twin cases against an
         existing rule's claimed scope). If omitted, the generator picks a
-        family itself (used for normal task-stream generation).
+        family itself (used for normal task-stream generation). If `variant`
+        is given, generate that variant; otherwise it is drawn from the seed.
 
         Returns a domain-specific Task object (for repo_repair: the
         RepoRepairTask defined in domain/repo_repair/schema.py).
