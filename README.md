@@ -88,6 +88,16 @@ recorded rule drafts (`runs/rule_drafts.jsonl`) and the promoted rules in
 `rules/registry.json`, so it needs no API calls. Routes of the HTTP service are
 defined in `src/serve.py`.
 
+## Task data
+
+Scripts that read a task set (`run_solver`, `run_router`, `eval_rules`) now default to
+`data/processed/tasks_v2.json`. It is produced by `python -m scripts.generate_tasks` and is
+deterministic: task *i* uses seed *i*, variants alternate (10 + 10), task ids are derived from the
+seed, and tracebacks store the repo as `<repo>/main.py` instead of a machine-specific temp path, so
+regenerating it gives a byte-identical file on any machine. `tasks_v1.json` (random variants, uuid
+ids, Windows temp paths in tracebacks) is kept unchanged for reference; the recorded runs in
+`runs/` were produced from it. Both files are tracked with DVC.
+
 ## Repository layout
 
 | Path | Contents |
@@ -96,6 +106,7 @@ defined in `src/serve.py`.
 | `src/registry.py`, `shadow.py`, `ci_checks.py`, `serve.py` | Registry, monitoring, CI gate, HTTP service |
 | `src/experiment.py`, `scripts/` | Replay evaluation and its scripts |
 | `src/domain/repo_repair/` | Domain adapter, task generator, audit backend |
+| `data/processed/tasks_v2.json` | Current task set (DVC-tracked); see "Task data" below |
 | `rules/registry.json`, `tests/regression/twins.jsonl` | Production rules, stored regression twins |
 | `audit_reports.jsonl` | Audit evidence: first-draft versus final rule scopes |
 | `results/` | Experiment results and chart |

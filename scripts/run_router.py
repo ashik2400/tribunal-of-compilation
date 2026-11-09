@@ -15,7 +15,7 @@ from src.router import Router
 from src.domain.repo_repair.solver_factory import default_solver_factory
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--tasks", default="data/processed/tasks_v1.json")
+ap.add_argument("--tasks", default="data/processed/tasks_v2.json")
 ap.add_argument("--registry", default="rules/registry.json")
 ap.add_argument("--solver-log", default="runs/solver_runs.jsonl", help="used to estimate the all-Solver baseline")
 ap.add_argument("--log", default="runs/router_log.jsonl")

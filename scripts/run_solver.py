@@ -1,6 +1,6 @@
 """Run the Solver on real repo_repair tasks and log every run as JSON lines.
     python -m scripts.run_solver --n 6
-Reads data/processed/tasks_v1.json (generates it first: python scripts/generate_tasks.py).
+Reads data/processed/tasks_v2.json (generate it first: python -m scripts.generate_tasks).
 Output: runs/solver_runs.jsonl  (input for the Compiler in the next milestone)."""
 import argparse, collections, json, os, sys, time
 from pathlib import Path
@@ -19,7 +19,7 @@ from src.solver import Solver
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--n", type=int, default=6)
-ap.add_argument("--tasks", default="data/processed/tasks_v1.json")
+ap.add_argument("--tasks", default="data/processed/tasks_v2.json")
 ap.add_argument("--out", default="runs/solver_runs.jsonl")
 args = ap.parse_args()
 

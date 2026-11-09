@@ -1,6 +1,6 @@
 """Judge every audited rule against the answer key (no LLM, no tokens).
     python -m scripts.eval_rules
-Compares the Auditor's verdict with how often the rule actually fires WRONGLY on data/processed/tasks_v1.json."""
+Compares the Auditor's verdict with how often the rule actually fires WRONGLY on data/processed/tasks_v2.json."""
 import argparse, json
 from pathlib import Path
 
@@ -10,7 +10,7 @@ from src.evaluation import evaluate_rule
 from src.rules import Rule
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--tasks", default="data/processed/tasks_v1.json")
+ap.add_argument("--tasks", default="data/processed/tasks_v2.json")
 ap.add_argument("--reports", default="runs/audit_reports.jsonl")
 args = ap.parse_args()
 
