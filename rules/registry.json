@@ -32,7 +32,8 @@
           "import_error_twin__needs_local_import__3c8e5eea",
           "import_error_twin__needs_local_import__5f9967f0",
           "import_error_twin__needs_local_import__1f55c735"
-        ]
+        ],
+        "domain": "repo_repair"
       },
       "state": "production",
       "version": 1,
@@ -99,7 +100,8 @@
           "import_error_twin__missing_package__381edb1c",
           "import_error_twin__missing_package__7229ce43",
           "import_error_twin__missing_package__c8e43fca"
-        ]
+        ],
+        "domain": "repo_repair"
       },
       "state": "production",
       "version": 1,
