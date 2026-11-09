@@ -4,6 +4,7 @@
     python -m scripts.registry_cli promote rule_xxxx
     python -m scripts.registry_cli demote rule_xxxx --reason "why"
     python -m scripts.registry_cli list
+    python -m scripts.registry_cli migrate               rewrite the file in the current schema (no state change)
 """
 import argparse, json, sys
 from pathlib import Path
@@ -13,7 +14,7 @@ from src.registry import Registry, RegistryError
 from src.rules import Rule
 
 ap = argparse.ArgumentParser()
-ap.add_argument("cmd", choices=["sync", "promote", "demote", "list"])
+ap.add_argument("cmd", choices=["sync", "promote", "demote", "list", "migrate"])
 ap.add_argument("rule_id", nargs="?")
 ap.add_argument("--all", action="store_true")
 ap.add_argument("--reason", default="")
@@ -55,6 +56,9 @@ try:
     elif args.cmd == "demote":
         reg.demote(args.rule_id, args.reason)
         print(f"{args.rule_id}: demoted")
+    elif args.cmd == "migrate":
+        reg.save()
+        print(f"rewrote {args.registry} in the current schema ({len(reg.entries)} rule(s), no state changed)")
 except RegistryError as e:
     sys.exit(f"error: {e}")
 show()

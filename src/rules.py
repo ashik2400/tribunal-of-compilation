@@ -71,6 +71,9 @@ class Rule(BaseModel):
     action: dict                         # fix template; {0}.. filled from the error's quoted names
     rationale: str = ""
     supporting_task_ids: list[str] = Field(default_factory=list)
+    # Which domain adapter this rule belongs to. Defaulted so rules saved before the field existed
+    # (registry, drafts, audit reports) load unchanged. Deliberately NOT part of registry.fingerprint().
+    domain: str = "repo_repair"
 
     def matches(self, signature: str, captures: list[str], files: dict[str, str]) -> bool:
         return signature == self.signature and all(p.holds(files, captures) for p in self.scope)

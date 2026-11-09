@@ -80,6 +80,11 @@ class Registry:
             self.entries = {k: Entry.model_validate(v) for k, v in data.get("entries", {}).items()}
 
     # ---------- persistence ----------
+    def save(self) -> None:
+        """Rewrite the registry file in the current schema without changing any state (used to migrate
+        files written by an older version, e.g. rules saved before Rule.domain existed)."""
+        self._save()
+
     def _save(self) -> None:
         if not self.path:
             return

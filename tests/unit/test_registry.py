@@ -150,3 +150,33 @@ def test_demoted_and_staging_rules_never_fire():
     assert r.resolve(SIG, ["colorutils"], MISSING)[0] is None            # staging only
     r.promote("A"); r.demote("A", "x")
     assert r.resolve(SIG, ["colorutils"], MISSING)[0] is None
+
+
+# ---------- schema migration: Rule.domain ----------
+def test_registry_saved_before_rule_domain_existed_still_loads(tmp_path):
+    """A registry written before Rule.domain existed loads with domain=repo_repair, keeps its fingerprints valid
+    (so the CI gate still passes), and only gains the field when it is saved again."""
+    r = staged(real_rule_a(), rule_b(), path=tmp_path / "reg.json")
+    r.promote("A")
+    data = json.loads((tmp_path / "reg.json").read_text())
+    for e in data["entries"].values():                         # strip the field: this is what an old file looks like
+        del e["rule"]["domain"]
+    old = tmp_path / "old.json"
+    old.write_text(json.dumps(data))
+
+    loaded = reg(old)
+    assert {rid: e.rule.domain for rid, e in loaded.entries.items()} == {"A": "repo_repair", "B": "repo_repair"}
+    assert all(fingerprint(e.rule) == e.fingerprint for e in loaded.entries.values())
+    assert loaded.entries["A"].state == "production" and loaded.entries["B"].state == "staging"
+    assert "domain" not in old.read_text()                     # loading alone never rewrites the file
+
+    loaded.save()
+    saved = json.loads(old.read_text())
+    assert all(e["rule"]["domain"] == "repo_repair" for e in saved["entries"].values())
+    stripped = lambda d: {k: {**e, "rule": {f: v for f, v in e["rule"].items() if f != "domain"}}
+                          for k, e in d["entries"].items()}
+    assert stripped(saved) == stripped(data)                   # nothing else changed
+
+
+def test_domain_is_not_part_of_the_fingerprint():
+    assert fingerprint(real_rule_a()) == fingerprint(real_rule_a().model_copy(update={"domain": "other"}))
